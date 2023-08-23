@@ -1,10 +1,13 @@
 #!/bin/bash -e
 
-# GCP02 NIC ID: ***
+echo "Checking USB NIC connection..."
+
+# GCP02 NIC ID: enxc436c0eaa070
 # GCP03 NIC ID: enx00e04c0a0ba6
 
 # get vehicle id from NIC device id
 declare -A NIC_DEV=(
+    ["enxc436c0eaa070"]="GCP02"
     ["enx00e04c0a0ba6"]="GCP03"
 )
 
@@ -17,8 +20,9 @@ do
 done
 
 if [ -z $VEHICLE_ID ]; then
-  echo "USB_NIC has not connected."
+  echo "  Error: Specified USB NIC has not connected."
   exit 1
 fi
 
-echo "VEHICLE_ID = $VEHICLE_ID"
+echo "  VEHICLE_ID = $VEHICLE_ID"
+echo "  Check OK."
