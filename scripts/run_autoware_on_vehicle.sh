@@ -22,14 +22,14 @@ if [ -z $VEHICLE_ID ]; then
   exit 1
 fi
 
-echo "USB NIC connection OK."
+echo "USB NIC connectivity OK."
 echo "VEHICLE_ID = $VEHICLE_ID"
 
 
 ### Lidar connection check
 /bin/ping 192.168.1.201 -w 1 -c 1 >> /dev/null
 if [ $? == 0 ]; then
-  echo "Velodyne connection OK."
+  echo "Velodyne connectivity OK."
   exit 1
 else
   echo "Error: Please check network settings and vehicle power is ON."
@@ -46,15 +46,15 @@ if [ -z $CAN_IF_EXIST ]; then
   sudo ip link set can0 txqueuelen 500000
   sudo ip link set can0 up
   set +e
+  echo "CAN Interface configuration done."
 fi
-echo "CAN interface is configured."
 
 # candump can0 check, get data ?
 if [ -z "`candump can0 -T 200`" ]; then
   echo "Error: Please check vehicle power is ON."
   exit 1
 fi
-echo "CAN connection OK."
+echo "CAN connectivity check OK."
 
 ### set environment
 export VEHICLE_MODEL=ymc_golfcart
