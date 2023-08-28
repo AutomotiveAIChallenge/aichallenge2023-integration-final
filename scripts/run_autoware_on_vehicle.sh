@@ -47,10 +47,16 @@ if [ -z $CAN_IF_EXIST ]; then
   sudo ip link set can0 up
   set +e
 fi
+echo "CAN interface is configured."
 
 # candump can0 check, get data ?
 #   if no: error, please check vehicle power is ON, exit...
 #   if yes: OK!
+if [ -z `candump can0 -T 200` ]; then
+  echo "Error: Please check vehicle power is ON."
+  exit 1
+fi
+echo "CAN connection OK."
 
 ### set environment
 export VEHICLE_MODEL=ymc_golfcart
@@ -59,6 +65,10 @@ export MAP_PATH="/home/autoware/autoware/map/data"
 
 # echo env var
 echo "Launch autoware."
-# wait 1 sec.
+echo "VEHICLE_ID=$VEHICLE_ID"
+echo "VEHICLE_MODEL=$VEHICLE_MODEL"
+echo "SENSOR_MODEL=$SENSOR_MODEL"
+echo "MAP_PATH=$MAP_PATH"
 
-ros2 launch autoware_launch autoware.launch.xml vehicle_model:=$VEHICLE_MODEL sensor_model:=$SENSOR_MODEL map_path:=$MAP_PATH
+# test
+echo "ros2 launch autoware_launch autoware.launch.xml vehicle_model:=$VEHICLE_MODEL sensor_model:=$SENSOR_MODEL map_path:=$MAP_PATH"
