@@ -12,6 +12,9 @@ do
   if [ -n "${NIC_DEV[$DEV_NAME]}" ]; then
     export VEHICLE_ID="${NIC_DEV[$DEV_NAME]}"   # Export VEHICLE_ID
   fi
+  if [ $DEV_NAME =~ "can0" ]; then              # Also check if CAN interface exist
+    CAN_IF_EXIST=true
+  fi
 done
 
 if [ -z $VEHICLE_ID ]; then
@@ -35,13 +38,15 @@ fi
 
 
 ### CAN interface connection check
-# if can0 does not exist, configure can0
-set -e
-echo "Configuring CAN interface..."
-sudo ip link set can0 type can bitrate 500000
-sudo ip link set can0 txqueuelen 500000
-sudo ip link set can0 up
-set +e
+# If can0 does not exist, configure can0
+if [ -z $CAN_IF_EXIST ]; then
+  set -e
+  echo "Configuring CAN interface..."
+  sudo ip link set can0 type can bitrate 500000
+  sudo ip link set can0 txqueuelen 500000
+  sudo ip link set can0 up
+  set +e
+fi
 
 # candump can0 check, get data ?
 #   if no: error, please check vehicle power is ON, exit...
