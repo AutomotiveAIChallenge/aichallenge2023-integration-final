@@ -5,6 +5,7 @@
 #include "geometry_msgs/msg/point.hpp"
 #include "autoware_auto_vehicle_msgs/msg/engage.hpp"
 #include "autoware_auto_vehicle_msgs/msg/control_mode_report.hpp"
+#include "autoware_auto_vehicle_msgs/srv/control_mode_command.hpp"
 
 #include <cstdio>
 #include <iostream>
@@ -22,17 +23,21 @@ public:
     
     // Publishers
     engage_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::Engage>("/autoware/engage", 1);
+
+    // Service Clients
+    control_mode_client_ = this->create_client<autoware_auto_vehicle_msgs::srv::ControlModeCommand>("/control/control_mode_request");
   }
 
 private:
 
   void vehicleControlModeCallback(const autoware_auto_vehicle_msgs::msg::ControlModeReport& msg) {
-    if (is_result_generated_)
-      return;
-    
-    // If mode is AUTONOMOUS=1, turn flag to true
-    if (msg.mode == 1)
+
+    // If mode is AUTONOMOUS=1
+    if (msg.mode == 1) {
       is_autonomous_mode_ = true;
+      is_overridden_ = false;
+      is_result_generated_ = false;
+    }
 
     // If already been in AUTONOMOUS mode and mode changed to MANUAL=4
     if (is_autonomous_mode_ && msg.mode == 4) {
@@ -62,6 +67,12 @@ private:
     disengage_autoware_msg.engage = false;
     engage_pub_->publish(disengage_autoware_msg);
 
+    // Disable Vehicle
+    const auto request = std::make_shared<autoware_auto_vehicle_msgs::srv::ControlModeCommand::Request>();
+    request->stamp = now();
+    request->mode = 4;
+    control_mode_client_->async_send_request(request);
+
     is_autonomous_mode_ = false;
   }
 
@@ -82,7 +93,14 @@ private:
   }
 
   void writeResultJson(const aichallenge_scoring_msgs::msg::Score& score_msg) {
-    std::ofstream ofs("result.json");
+
+    // Get time and use it to name the result.json filename
+    time_t t = time(0);
+    struct tm * now = localtime(&t);
+    char filename[50];
+    strftime(filename, 50, "results/%Y-%m-%d_%H-%M-%S_result.json", now);
+
+    std::ofstream ofs(filename);
     ofs << "{" << std::endl;
     ofs << "  \"rawDistanceScore\": " << score_msg.distance_score << "," << std::endl;
     ofs << "  \"distanceScore\": " << calculateDistanceScore(score_msg) << "," << std::endl;
@@ -104,6 +122,9 @@ private:
 
   // Publishers
   rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::Engage>::SharedPtr engage_pub_;
+
+  // Service Clients
+  rclcpp::Client<autoware_auto_vehicle_msgs::srv::ControlModeCommand>::SharedPtr control_mode_client_;
 
   rclcpp::TimerBase::SharedPtr timer;
 
