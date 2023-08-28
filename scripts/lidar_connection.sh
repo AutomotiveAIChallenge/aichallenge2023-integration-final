@@ -1,16 +1,19 @@
 #!/bin/bash
 
-### USB NIC connection check and get VEHICLE_ID
-declare -A NIC_DEV=(    #Specified USB NIC ID
+### USB NIC connectivity check and VEHICLE_ID identification
+# Declare specified USB NIC ID
+declare -A NIC_DEV=(
     ["enxc436c0eaa070"]="GCP02"
     ["enx00e04c0a0ba6"]="GCP03"
 )
 
+# USB NIC connectivity check
 for DEV in `find /sys/devices -name net | grep -v virtual`
 do
   DEV_NAME=("$(ls --quoting-style=shell $DEV)")
   if [ -n "${NIC_DEV[$DEV_NAME]}" ]; then
-    export VEHICLE_ID="${NIC_DEV[$DEV_NAME]}"   # Export VEHICLE_ID
+    # Export VEHICLE_ID
+    export VEHICLE_ID="${NIC_DEV[$DEV_NAME]}"
   fi
 done
 

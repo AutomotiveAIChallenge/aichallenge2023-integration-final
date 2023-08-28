@@ -3,7 +3,7 @@
 ### PCAN-USB connection check
 for USB_DEV in `lsusb`
 do
-  if [ $USB_DEV = "PCAN-USB" ]; then              # Check PCAN-USB connectivity
+  if [ $USB_DEV = "PCAN-USB" ]; then
     PCAN_USB_CONNECTION=true
   fi
 done
@@ -15,7 +15,7 @@ else
   exit 1
 fi
 
-### can0 configuring check
+### can0 configuration check
 for IF_DEV in `ifconfig`
 do
   if [ $IF_DEV = "can0:" ]; then
