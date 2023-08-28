@@ -1,28 +1,45 @@
 #!/bin/bash
 
-for DEV in `find /sys/devices -name net | grep -v virtual`
+### PCAN-USB connection check
+for USB_DEV in `lsusb`
 do
-  DEV_NAME=("$(ls --quoting-style=shell $DEV)")
-  if [ $DEV_NAME =~ "can0" ]; then
+  if [ $USB_DEV = "PCAN-USB" ]; then              # Check PCAN-USB connectivity
+    PCAN_USB_CONNECTION=true
+  fi
+done
+
+if [ "${PCAN_USB_CONNECTION}" ]; then
+  echo "PCAN-USB is connected."
+else
+  echo "Error: PCAN-USB is not connected."
+  exit 1
+fi
+
+### can0 configuring check
+for IF_DEV in `ifconfig`
+do
+  if [ $IF_DEV = "can0:" ]; then
     CAN_IF_EXIST=true
   fi
 done
 
-### CAN interface connection check
 # If can0 does not exist, configure can0
-if [ -z $CAN_IF_EXIST ]; then
+if [ "${CAN_IF_EXIST}" ]; then
+  echo "can0 already configured."
+else
   set -e
   echo "Configuring CAN interface..."
   sudo ip link set can0 type can bitrate 500000
   sudo ip link set can0 txqueuelen 500000
   sudo ip link set can0 up
   set +e
+  echo "can0 configuring done."
 fi
 
-# candump can0 check, get data ?
+# CAN data reception check
+echo "Check candump..."
 if [ -z "`candump can0 -T 200`" ]; then
   echo "Error: Please check vehicle power is ON."
   exit 1
 fi
-
 echo "CAN Interface configuration done."
