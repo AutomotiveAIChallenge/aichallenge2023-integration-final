@@ -50,9 +50,7 @@ fi
 echo "CAN interface is configured."
 
 # candump can0 check, get data ?
-#   if no: error, please check vehicle power is ON, exit...
-#   if yes: OK!
-if [ -z `candump can0 -T 200` ]; then
+if [ -z "`candump can0 -T 200`" ]; then
   echo "Error: Please check vehicle power is ON."
   exit 1
 fi
