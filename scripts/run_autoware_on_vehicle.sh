@@ -16,5 +16,5 @@ echo "  VEHICLE_MODEL=$VEHICLE_MODEL"
 echo "  SENSOR_MODEL=$SENSOR_MODEL"
 echo "  MAP_PATH=$MAP_PATH"
 
-# test
+# Launch autoware
 ros2 launch autoware_launch autoware.launch.xml vehicle_model:=$VEHICLE_MODEL sensor_model:=$SENSOR_MODEL map_path:=$MAP_PATH
