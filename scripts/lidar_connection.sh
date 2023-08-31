@@ -4,7 +4,7 @@
 # Declare specified USB NIC ID
 declare -A NIC_DEV=(
     ["enxc436c0eaa070"]="GCP02"
-    ["enx00e04c0a0ba6"]="GCP03"
+    ["enx68e1dc12f7f8"]="GCP03"
 )
 
 # USB NIC connectivity check
