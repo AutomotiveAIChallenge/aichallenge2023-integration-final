@@ -97,8 +97,8 @@ private:
     // Get time and use it to name the result.json filename
     time_t t = time(0);
     struct tm * now = localtime(&t);
-    char filename[50];
-    strftime(filename, 50, "results/%Y-%m-%d_%H-%M-%S_result.json", now);
+    char filename[100];
+    strftime(filename, 100, "/home/autoware/autoware/results/%Y-%m-%d_%H-%M-%S_result.json", now);
 
     std::ofstream ofs(filename);
     ofs << "{" << std::endl;
